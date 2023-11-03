@@ -2,10 +2,8 @@
 package mybooks;
 
 import controller.LibroController;
-import controller.OperacionesController;
 import model.ConsultasLibro;
 import model.Libro;
-import view.ListaLibros;
 import view.VentanaPrincipal;
 
 
@@ -19,9 +17,7 @@ public class Programa {
         ConsultasLibro consulta = new ConsultasLibro();
         LibroController controlador = new LibroController(view,modelo,consulta);
         controlador.iniciar();
-        
-        
-        
+       
     }
     
 }

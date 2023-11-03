@@ -93,6 +93,12 @@ public class ListaLibros extends javax.swing.JFrame {
 
         jLabel2.setText("Genero: ");
 
+        txttitulo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txttituloActionPerformed(evt);
+            }
+        });
+
         jLabel3.setText("Autor: ");
 
         txtAutor.addActionListener(new java.awt.event.ActionListener() {
@@ -181,6 +187,10 @@ public class ListaLibros extends javax.swing.JFrame {
     private void formMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_formMouseClicked
         
     }//GEN-LAST:event_formMouseClicked
+
+    private void txttituloActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txttituloActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txttituloActionPerformed
 
     /**
      * @param args the command line arguments

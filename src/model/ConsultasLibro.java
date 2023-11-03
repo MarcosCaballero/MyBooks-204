@@ -6,9 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.sql.Statement;
-import javax.swing.JComboBox;
 import javax.swing.JTable;
+import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
 
 
@@ -50,10 +49,13 @@ public class ConsultasLibro extends Conexion{
                     filas[i] = rs.getObject(i+1); 
                 }
                 modelo.addRow(filas);   
-            }    
+            }  
             
+           
         }catch(SQLException e){
+            
             System.err.println(e.toString());
+           
             
         }finally{
             con.close();
@@ -91,21 +93,32 @@ public class ConsultasLibro extends Conexion{
     }
     
     //Método para modificar libros
-    public boolean modificarLibro(Libro lib){
+    public boolean modificarLibro(JTable table,JTextField txt1,JTextField txt2,JTextField txt3){
         
-        PreparedStatement ps = null;
-        Connection con = getConexion();
+        int fila = table.getSelectedRow();
+        String id = table.getValueAt(fila,0).toString();
         
-        String sql = "UPDATE libro SET titulo=?, genero=?, autor=? WHERE id=?";
+        
+        
+        String sql = "UPDATE Libro SET titulo=?, genero=?, autor=? WHERE idLibro=?";
         
         try{
-            ps = con.prepareStatement(sql); //acá le paso la consulta sql creada
-            //en esta parte se interactúa con el modelo libro
-            ps.setString(1, lib.getTitulo());
-            ps.setString(2, lib.getGenero());
-            ps.setString(3, lib.getAutor());
-            ps.setInt(4,lib.getId());
+            PreparedStatement ps = null;
+            Connection con = getConexion();
+            
+            ps = con.prepareStatement(sql); 
+          
+            ps.setString(1, txt1.getText()); 
+            ps.setString(2, txt2.getText());
+            ps.setString(3, txt3.getText());
+            ps.setString(4, id);
+            
             ps.execute();
+            
+            table.setValueAt(txt1.getText(), fila, 1);
+            table.setValueAt(txt2.getText(), fila, 2);
+            table.setValueAt(txt3.getText(), fila, 3);
+            
             return true;
         }catch(SQLException e){
             System.err.println(e);
@@ -121,17 +134,20 @@ public class ConsultasLibro extends Conexion{
     }
     
     //método para eliminar un libro    
-    public boolean eliminarLibro(Libro lib){
+    public boolean eliminarLibro(Libro lib,JTextField txt1){
         
         PreparedStatement ps = null;
         Connection con = getConexion();
         
-        String sql = "DELETE FROM libro WHERE id=?";
+        String sql = "DELETE FROM libro WHERE titulo=?";
         
         try{
+            
             ps = con.prepareStatement(sql);
-            ps.setInt(1, lib.getId());
+            ps.setString(1,txt1.getText() );
             ps.execute();
+            
+           
             return true;
         }catch(SQLException e){
             System.err.println(e);
@@ -195,29 +211,66 @@ public class ConsultasLibro extends Conexion{
         
     }
     
-    //método para cargar datos de la BD en el combobox
-    public void cargarComboBox(JComboBox cb) throws SQLException{
+ 
+    
+    //método para pasar los datos del JTable a los JTextField
+    public void cargarTxt(JTable table,JTextField txt1,JTextField txt2,JTextField txt3) throws SQLException{
+        
         try{
             PreparedStatement ps = null;
             ResultSet rs = null; 
         
             Connection con = getConexion();
             
-            String sql = "SELECT nombreGenero FROM Genero";
+            int fila = table.getSelectedRow();
+            String id = table.getValueAt(fila,0).toString();
+            
+            String sql = "SELECT titulo, genero, autor FROM Libro WHERE idLibro=?";
             
             ps = con.prepareStatement(sql);
-            rs = ps.executeQuery(); //para que me devuleva los resultados de la consulta
-            
+            ps.setString(1,id);
+            rs = ps.executeQuery();
+                        
             while(rs.next()){
-                cb.addItem(rs.getString("nombreGenero"));
+                txt1.setText(rs.getString("titulo"));
+                txt2.setText(rs.getString("genero"));
+                txt3.setText(rs.getString("autor"));
             }
-            
-            rs.close();
             
         }catch(SQLException e){
             System.err.println(e.toString());
         }finally{
-            con.close(); 
+            con.close();
+        }
+        
+        
+    }
+    
+    //método para comprobar si hay datos en la BD
+    public boolean comprobarDatos(String condicion){
+        try{
+           
+            PreparedStatement ps = null;
+            ResultSet rs = null;
+            
+            Connection con = getConexion();
+            
+            String sql = "SELECT idLibro, titulo, genero, autor FROM Libro where titulo like '%"+ condicion +"%'";
+            
+            ps = con.prepareStatement(sql);
+            rs = ps.executeQuery();
+            
+            return rs.next();
+            
+        }catch(SQLException e){
+            return false;
+            
+        }finally{
+            try {
+                con.close();
+            } catch (SQLException ex) {
+                System.err.print("Ha ocurrido un error: " + ex.getMessage());
+            }
         }
     }
     

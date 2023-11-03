@@ -40,6 +40,7 @@ public class LibroController implements ActionListener{ //implementa ActionListe
         ListaLibros lista = new ListaLibros();
         OperacionesController opcontroller = new OperacionesController(lista,modelo,consulta);
         opcontroller.iniciarc();
+        opcontroller.eventoTabla();
         
         try{
             consulta.traerLibros(lista.tableLibros);
@@ -53,16 +54,22 @@ public class LibroController implements ActionListener{ //implementa ActionListe
         
         ListaLibros rbusqueda = new ListaLibros();
         rbusqueda = new ListaLibros();
-        rbusqueda.setVisible(true);
-        rbusqueda.setLocationRelativeTo(null);
-        rbusqueda.lblTituloLista.setText("Resultados de búsqueda");
-        rbusqueda.setTitle("Resultados de la búsqueda");
-         
+                 
         consulta = new ConsultasLibro();
         try{
-            consulta.buscarLibro(rbusqueda.tableLibros,busqueda);
+            boolean respuesta = consulta.comprobarDatos(busqueda);   //buscarLibro(rbusqueda.tableLibros,busqueda);
+            if(respuesta){
+                
+               
+                OperacionesController opcontroller = new OperacionesController(rbusqueda,modelo,consulta);
+                opcontroller.iniciarc();
+                consulta.buscarLibro(rbusqueda.tableLibros,busqueda);
+                opcontroller.eventoTabla();
+                rbusqueda.setTitle("Resultados de la búsqueda");
+            }else{
+               JOptionPane.showMessageDialog(null,"No se encontraron resultados para la búsqueda.\n Por favor, ingrese otro título."); 
+            }
             
-
         }catch (SQLException ex) {
             Logger.getLogger(ListaLibros.class.getName()).log(Level.SEVERE, null, ex);
         }

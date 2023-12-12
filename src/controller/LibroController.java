@@ -43,7 +43,9 @@ public class LibroController implements ActionListener{ //implementa ActionListe
         opcontroller.eventoTabla();
         
         try{
-            consulta.traerLibros(lista.tableLibros);
+                        
+            consulta.traerLibros(lista.tableLibros); 
+ 
         }catch (SQLException ex) {
             Logger.getLogger(ListaLibros.class.getName()).log(Level.SEVERE, null, ex);
         }

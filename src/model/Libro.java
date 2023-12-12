@@ -7,6 +7,7 @@ public class Libro {
     private String titulo;
     private String autor;
     private String genero;
+    private byte [] imagen;
    
 
     public Libro() {
@@ -51,6 +52,14 @@ public class Libro {
 
     public void setGenero(String genero) {
         this.genero = genero;
+    }
+
+    public byte[] getImagen() {
+        return imagen;
+    }
+
+    public void setImagen(byte[] imagen) {
+        this.imagen = imagen;
     }
 
       

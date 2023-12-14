@@ -63,7 +63,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
         lblTitulo.setFont(new java.awt.Font("Felix Titling", 1, 48)); // NOI18N
         lblTitulo.setText("MyBooks");
 
-        lblBusqueda.setFont(new java.awt.Font("Dialog", 1, 18)); // NOI18N
+        lblBusqueda.setFont(new java.awt.Font("Felix Titling", 1, 18)); // NOI18N
         lblBusqueda.setText("Busqueda de libros:");
 
         txtBuscarLibro.addActionListener(new java.awt.event.ActionListener() {
@@ -107,7 +107,7 @@ public class VentanaPrincipal extends javax.swing.JFrame {
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addGap(0, 13, Short.MAX_VALUE))
             .addGroup(layout.createSequentialGroup()
-                .addGap(34, 34, 34)
+                .addGap(57, 57, 57)
                 .addComponent(lblTitulo)
                 .addGap(39, 39, 39)
                 .addComponent(lblBusqueda)

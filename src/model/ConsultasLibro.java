@@ -1,19 +1,24 @@
-//Acá manejo las consultas a la base de datos
+//consultas a la base de datos
 package model;
 
 import java.awt.Image;
-import java.awt.TextField;
-import java.awt.Toolkit;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.table.DefaultTableModel;
@@ -103,7 +108,8 @@ public class ConsultasLibro extends Conexion{
             try{
                 con.close();
             }catch(SQLException e){
-                System.err.println(e);
+                //System.err.println(e);
+                JOptionPane.showMessageDialog(null,"Error - Debe Agregar una imagen");
             }
         }
         
@@ -161,7 +167,7 @@ public class ConsultasLibro extends Conexion{
     }
     
     //método para eliminar un libro    
-    public boolean eliminarLibro(Libro lib,JTextField txt1){
+    public boolean eliminarLibro(Libro lib,JTextField txt1){ //modificar eliminar por id y no por titulo
         
         PreparedStatement ps = null;
         Connection con = getConexion();
@@ -235,7 +241,7 @@ public class ConsultasLibro extends Conexion{
     
    
     //método para pasar los datos del JTable a los JTextField
-    public void cargarTxt(JTable table,JTextField txt1,JTextField txt2,JTextField txt3,JTextField txt4,JLabel lblImagen) throws SQLException{
+    public void cargarTxt(JTable table,JTextField txt1,JTextField txt2,JTextField txt3,JTextField txt4,JLabel lblImagen) throws SQLException, IOException{
         
         try{
             PreparedStatement ps = null;
@@ -251,20 +257,28 @@ public class ConsultasLibro extends Conexion{
             ps = con.prepareStatement(sql);
             ps.setString(1,id);
             rs = ps.executeQuery();
-                        
+            
+         
             while(rs.next()){ 
                 txt1.setText(rs.getString("titulo"));
                 txt2.setText(rs.getString("genero"));
                 txt3.setText(rs.getString("autor"));
                 txt4.setText(rs.getString("rutaImagen"));
-                
-                //cargo la imagen en el JLabel
-                Image foto = Toolkit.getDefaultToolkit().getImage("imagen");
-                foto = foto.getScaledInstance(130, 160, Image.SCALE_DEFAULT);
-                lblImagen.setIcon(new ImageIcon(foto));
-                
-                
-                
+                //leer el binario
+                Blob blob = rs.getBlob("imagen");
+                //paso de binario a imagen
+                byte[] data = blob.getBytes(1, (int)blob.length());
+                //lectura de la imagen
+                BufferedImage img = null;
+                try{
+                    img = ImageIO.read(new ByteArrayInputStream(data));
+                    
+                }catch(IOException e){
+                    System.err.println(e);
+                }
+                ImageIcon icono = new ImageIcon(img);
+                Icon imagen = new ImageIcon(icono.getImage().getScaledInstance(lblImagen.getWidth(),lblImagen.getHeight(), Image.SCALE_DEFAULT));
+                lblImagen.setIcon(imagen);
             }
             
         }catch(SQLException e){
@@ -276,6 +290,9 @@ public class ConsultasLibro extends Conexion{
         
     }
     
+    //método para obtener la imagen para el pdf
+    
+       
     //método para comprobar si hay datos en la BD
     public boolean comprobarDatos(String condicion){
         try{
@@ -285,12 +302,12 @@ public class ConsultasLibro extends Conexion{
             
             Connection con = getConexion();
             
-            String sql = "SELECT idLibro, titulo, genero, autor FROM Libro where titulo like '%"+ condicion +"%'";
+            String sql = "SELECT titulo FROM Libro where titulo like '%"+ condicion +"%'";
             
             ps = con.prepareStatement(sql);
             rs = ps.executeQuery();
             
-            return rs.next();
+            return rs.next(); //devuelve true o false
             
         }catch(SQLException e){
             return false;

@@ -2,6 +2,7 @@
 package controller;
 
 
+
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
@@ -10,6 +11,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -24,21 +26,23 @@ import model.Libro;
 import view.ListaLibros;
 
 
+
 public class OperacionesController implements ActionListener{
     
-    protected ListaLibros vistaLibros = new ListaLibros();
-    protected Libro libro = new Libro();
-    protected ConsultasLibro consultas = new ConsultasLibro();
+    protected ListaLibros vistaLibros;
+    protected Libro libro;
+    protected ConsultasLibro consultas;
 
-    public OperacionesController(ListaLibros vistaLibros, Libro libro, ConsultasLibro consultas) {
-        this.vistaLibros = vistaLibros;
-        this.libro = libro;
-        this.consultas = consultas;
+    public OperacionesController(ListaLibros vistaLibros) {
+        this.vistaLibros= vistaLibros;
+        this.libro = new Libro();
+        this.consultas = new ConsultasLibro();
         this.vistaLibros.btnGuardar.addActionListener(this);
         this.vistaLibros.btnModificar.addActionListener(this);
         this.vistaLibros.btnEliminar.addActionListener(this);
         this.vistaLibros.btnSeleccionar.addActionListener(this);
         this.vistaLibros.btnLimpiar.addActionListener(this);
+        this.vistaLibros.btnPDF.addActionListener(this);
               
     }
     
@@ -52,15 +56,19 @@ public class OperacionesController implements ActionListener{
         String titulo = vistaLibros.txttitulo.getText();
         String genero = vistaLibros.txtgenero.getText();
         String autor = vistaLibros.txtAutor.getText();
-        if("".equals(titulo) ||"".equals(genero) || "".equals(autor) ){
+        String ruta = vistaLibros.txtImagen.getText();
+        
+        if("".equals(titulo) ||"".equals(genero) || "".equals(autor) ||"".equals(ruta) ){
             JOptionPane.showMessageDialog(null, "Debe completar todos los campos");
         }
+        
         libro.setTitulo(titulo);
         libro.setGenero(genero);
         libro.setAutor(autor);
         
        boolean respuesta = consultas.agregarLibro(libro,txt);
-       if(respuesta == true){
+       
+       if(respuesta){
            JOptionPane.showMessageDialog(null,"Libro agregado con éxito");
            limpiarCampos();
            consultas.traerLibros(vistaLibros.tableLibros);
@@ -77,7 +85,9 @@ public class OperacionesController implements ActionListener{
                try {
                    consultas.cargarTxt(vistaLibros.tableLibros, vistaLibros.txttitulo, vistaLibros.txtgenero,vistaLibros.txtAutor, vistaLibros.txtImagen, vistaLibros.lblFoto);
                } catch (SQLException ex) {
-                    System.err.println(ex);
+                   Logger.getLogger(OperacionesController.class.getName()).log(Level.SEVERE, null, ex);
+               } catch (IOException ex) {
+                   Logger.getLogger(OperacionesController.class.getName()).log(Level.SEVERE, null, ex);
                }
            }
         });
@@ -110,10 +120,10 @@ public class OperacionesController implements ActionListener{
     private void seleccionarImagen(){
       
         FileNameExtensionFilter filtro = new FileNameExtensionFilter("Formatos de archivos JPG, PNG", "jpg","png"); //Aplica filtro para los formatos de imagen aceptados
-        JFileChooser archivo = new JFileChooser();
+        JFileChooser archivo = new JFileChooser(); //
         archivo.addChoosableFileFilter(filtro);//añade el filtro al selector de archivos
-        archivo.setDialogTitle("Seleccionar foto"); 
-        File ruta = new File("C:\\Users\\rocio\\OneDrive\\Documentos"); //ruta en la que abre el selector de archivos
+        archivo.setDialogTitle("Seleccionar foto");  //titulo ventana
+        File ruta = new File("./src/img"); //ruta en la que abre el selector de archivos
         archivo.setCurrentDirectory(ruta); //establece la ruta inicial del selector
              
        
@@ -131,6 +141,7 @@ public class OperacionesController implements ActionListener{
              
     }
     
+
     //método para limpiar los campos del formulario
     public void limpiarCampos(){
         vistaLibros.txttitulo.setText("");
@@ -154,6 +165,7 @@ public class OperacionesController implements ActionListener{
             }
             
         }
+        //botón modificar
         if(e.getSource() == vistaLibros.btnModificar){
             try {
                 editar(vistaLibros.txtImagen,vistaLibros.tableLibros, vistaLibros.txttitulo, vistaLibros.txtgenero, vistaLibros.txtAutor);
@@ -178,8 +190,25 @@ public class OperacionesController implements ActionListener{
         if(e.getSource() == vistaLibros.btnLimpiar){
             limpiarCampos();
         }
+        
+        if(e.getSource() == vistaLibros.btnPDF){
+            
+            if(vistaLibros.txttitulo.getText().isEmpty() | vistaLibros.txtAutor.getText().isEmpty() |
+                vistaLibros.txtgenero.getText().isEmpty() | vistaLibros.txtImagen.getText().isEmpty()){
+                
+                JOptionPane.showMessageDialog(null,"Debe seleccionar un libro para generar un PDF");
+            }else{
+               
+                PdfController.crearPDF(vistaLibros.txttitulo, vistaLibros.txtgenero, vistaLibros.txtAutor, vistaLibros.txtImagen);
+                JOptionPane.showMessageDialog(null,"PDF creado con éxito");
+
+            }
+            
+           
+        }
+        
     }
-    
+
     
     
 }

@@ -7,30 +7,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import model.ConsultasLibro;
-import model.Libro;
 import view.ListaLibros;
 import view.VentanaPrincipal;
 
 
 public class LibroController implements ActionListener{ //implementa ActionListener para escuchar eventos
     
+    
+    //atributos
     protected VentanaPrincipal vista; //vista ventana principal
-    protected Libro modelo; 
-    protected ConsultasLibro consulta = new ConsultasLibro();
+    protected ConsultasLibro consulta; 
     
-    
-    public LibroController(VentanaPrincipal vista, Libro modelo, ConsultasLibro consulta) {
-        this.vista = vista;
-        this.modelo = modelo;
-        this.consulta = consulta;
-        this.vista.btnBuscar.addActionListener(this);
+    //controlador
+    public LibroController() {
+        this.vista = new VentanaPrincipal();
+        this.consulta = new ConsultasLibro();
+        this.vista.btnBuscar.addActionListener(this);// para que detecte el evento
         this.vista.btnListado.addActionListener(this);
-        
+        iniciar();
     
     }
     
     //método para que el controlador inicie
-    public void iniciar(){
+    protected void iniciar(){
         vista.setVisible(true);
         vista.setLocationRelativeTo(null);
     }
@@ -38,7 +37,7 @@ public class LibroController implements ActionListener{ //implementa ActionListe
     //metodo para que el controlador abra la ventana ListaLibros
     public void iniciarListado(){
         ListaLibros lista = new ListaLibros();
-        OperacionesController opcontroller = new OperacionesController(lista,modelo,consulta);
+        OperacionesController opcontroller = new OperacionesController(lista);
         opcontroller.iniciarc();
         opcontroller.eventoTabla();
         
@@ -63,7 +62,7 @@ public class LibroController implements ActionListener{ //implementa ActionListe
             if(respuesta){
                 
                
-                OperacionesController opcontroller = new OperacionesController(rbusqueda,modelo,consulta);
+                OperacionesController opcontroller = new OperacionesController(rbusqueda);
                 opcontroller.iniciarc();
                 consulta.buscarLibro(rbusqueda.tableLibros,busqueda);
                 opcontroller.eventoTabla();
@@ -81,6 +80,9 @@ public class LibroController implements ActionListener{ //implementa ActionListe
     //funcionalidad de los botones
     @Override
     public void actionPerformed(ActionEvent e){
+        //condicional para los botones
+        
+        //boton de búsqueda
         if(e.getSource() == vista.btnBuscar){
             String campo = vista.txtBuscarLibro.getText(); //tomo el texto del campo de  búsqueda
             if("".equals(campo)){ //si la variable está vacía muestra msj alerta
@@ -90,6 +92,8 @@ public class LibroController implements ActionListener{ //implementa ActionListe
             }
             limpiarFormVentanaPrincipal();
         }
+        
+        //botón listado
         if(e.getSource() == vista.btnListado){
             iniciarListado();
         }
